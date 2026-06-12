@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruling — the VET assessment compliance operator</title>
+<meta name="description" content="A folder-based AI operator for Australian VET assessment. It rules on two axes — authenticity and currency — and commits the change end-to-end across the assessment, the Word doc, and the LMS. Part of Learnbuilt.">
+<style>
+  :root{
+    --bg:#06100A; --panel:#0c1a10; --card:#101F14; --line:#1d3324; --line2:#2A4A35;
+    --green:#00E676; --teal:#00D4AA; --ink:#EDF5EF; --soft:#A7C6B2; --mute:#7DAA8A;
+    --amber:#ffcf5c; --orange:#ff9d5c; --red:#ff7a7a; --violet:#c4b5fd;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--ink);line-height:1.6;
+    font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:960px;margin:0 auto;padding:0 24px;}
+  code,pre,.mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
+  a{color:var(--green);text-decoration:none;}
+
+  header{padding:72px 0 60px;border-bottom:1px solid var(--line);
+    background:radial-gradient(900px 380px at 12% -10%, rgba(0,230,118,.10), transparent 60%);}
+  .kicker{display:inline-block;font-size:12px;font-weight:600;letter-spacing:.6px;color:var(--green);
+    border:1px solid var(--line2);border-radius:999px;padding:5px 13px;margin-bottom:22px;}
+  .kicker b{color:var(--ink);font-weight:700;}
+  h1{font-size:58px;line-height:1.02;letter-spacing:-2px;font-weight:800;margin:0 0 16px;}
+  h1 .pin{color:var(--green);}
+  .tag{font-size:21px;color:var(--soft);max-width:720px;margin:0 0 10px;}
+  .tag b{color:var(--ink);}
+  .pair{font-size:15.5px;color:var(--mute);margin:18px 0 30px;}
+  .pair b{color:var(--ink);}
+  .cta{display:flex;gap:12px;flex-wrap:wrap;}
+  .btn{display:inline-block;font-weight:600;font-size:15px;padding:12px 22px;border-radius:9px;transition:.15s;}
+  .btn.primary{background:var(--green);color:#04130a;}
+  .btn.primary:hover{background:#33ec90;}
+  .btn.ghost{border:1px solid var(--line2);color:var(--ink);}
+  .btn.ghost:hover{border-color:var(--green);color:var(--green);}
+
+  section{padding:56px 0;border-bottom:1px solid var(--line);}
+  h2.label{font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--mute);margin:0 0 26px;}
+  h3{font-size:25px;letter-spacing:-.4px;margin:0 0 12px;}
+  p.lead{font-size:16.5px;color:var(--soft);max-width:780px;}
+  p.lead b{color:var(--ink);}
+
+  .axes{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:8px;}
+  .axis{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px;}
+  .axis .ax{font-size:12px;font-weight:700;letter-spacing:.8px;color:var(--green);}
+  .axis h4{font-size:19px;margin:6px 0 8px;}
+  .axis p{font-size:14.5px;color:var(--soft);margin:0 0 12px;}
+  .axis .scale{font-size:12.5px;color:var(--mute);font-family:"JetBrains Mono",monospace;}
+  .axis.b .ax{color:var(--teal);}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;border-left:4px solid var(--line2);}
+  .card .name{font-weight:800;font-size:15px;letter-spacing:.4px;margin-bottom:6px;}
+  .card p{margin:0;font-size:13.5px;color:var(--soft);}
+  .c-green{border-left-color:var(--green);} .c-green .name{color:var(--green);}
+  .c-amber{border-left-color:var(--amber);} .c-amber .name{color:var(--amber);}
+  .c-orange{border-left-color:var(--orange);} .c-orange .name{color:var(--orange);}
+  .c-red{border-left-color:var(--red);} .c-red .name{color:var(--red);}
+  .c-violet{border-left-color:var(--violet);} .c-violet .name{color:var(--violet);}
+
+  /* end-to-end strip */
+  .flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;margin-top:6px;}
+  .flow .node{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;}
+  .flow .node .t{font-weight:700;font-size:14.5px;color:var(--ink);}
+  .flow .node .d{font-size:12.5px;color:var(--mute);margin-top:4px;}
+  .flow .arr{display:flex;align-items:center;color:var(--green);font-size:22px;padding:0 8px;}
+
+  /* before/after */
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;}
+  .ba .col{border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+  .ba .h{padding:10px 16px;font-size:12.5px;font-weight:700;letter-spacing:.5px;}
+  .ba .before .h{background:#1a0f0f;color:#ff9d9d;}
+  .ba .after .h{background:#0c1f14;color:var(--green);}
+  .ba pre{margin:0;padding:16px;font-size:12px;line-height:1.6;color:#cfe6d8;white-space:pre-wrap;background:#091309;max-height:340px;overflow:auto;}
+  .ba .after pre{background:#08160d;}
+  .badge3{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+  .badge3 span{font-size:12px;font-family:"JetBrains Mono",monospace;color:var(--ink);background:var(--card);border:1px solid var(--line2);border-radius:7px;padding:6px 11px;}
+  .badge3 b{color:var(--green);}
+
+  .stages{display:flex;flex-direction:column;}
+  .stage{display:flex;gap:16px;padding:11px 0;border-bottom:1px solid var(--line);}
+  .stage:last-child{border-bottom:none;}
+  .stage .n{flex:0 0 92px;font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:700;color:var(--green);padding-top:2px;}
+  .stage .b h4{margin:0 0 2px;font-size:15.5px;}
+  .stage .b p{margin:0;font-size:13.5px;color:var(--soft);}
+  .stage.commit .n{color:var(--teal);}
+
+  ol.how{padding-left:20px;margin:0;} ol.how li{margin-bottom:12px;font-size:15px;color:var(--soft);}
+  ol.how li b{color:var(--ink);}
+  .inst{background:var(--card);border:1px solid var(--line2);border-radius:9px;padding:12px 15px;font-size:13px;color:var(--ink);margin-top:6px;}
+
+  footer{padding:40px 0 56px;color:var(--mute);font-size:14px;}
+  footer .lb{color:var(--ink);font-weight:700;} footer .lb .g{color:var(--green);}
+  @media(max-width:720px){h1{font-size:40px;}.axes,.ba{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <span class="kicker">Part of <b>Learn<span style="color:var(--green)">built</span></b> · Australian VET · built against ASQA 2025 Outcome Standards</span>
+    <h1>Ruling<span class="pin">.</span></h1>
+    <p class="tag">The compliance operator for VET assessment. It rules on <b>two axes</b> — is the evidence the student's own, and does the task assess the work the way it's <b>actually done now</b> — then <b>commits the change end-to-end</b>: the assessment, the Word doc, and the LMS page.</p>
+    <p class="pair"><b>Warrant researches the unit. Ruling rules on the task — and acts on it.</b> The researcher finds where AI has reshaped the work; the operator enforces it, modernises what's obsolete, and ships the fix.</p>
+    <div class="cta">
+      <a class="btn primary" href="https://github.com/hubbardjoshua9-a11y/ruling">View on GitHub</a>
+      <a class="btn ghost" href="https://github.com/hubbardjoshua9-a11y/ruling/blob/main/JUDGE_GUIDE.md">Verify it in 2 minutes →</a>
+    </div>
+    <div style="margin-top:24px;max-width:760px;">
+      <div style="position:relative;padding-bottom:56.25%;height:0;border-radius:12px;overflow:hidden;border:1px solid var(--line2);">
+        <iframe style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" src="https://www.youtube.com/embed/oTXNnpUabAs" title="Ruling — walkthrough" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
+      <p style="margin:8px 0 0;font-size:13px;color:var(--mute);">📺 Walkthrough · ~6 min · the full task-to-committed-change run</p>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <h2 class="label">Why two axes</h2>
+    <h3>Most "AI-proofing" only asks half the question.</h3>
+    <p class="lead">The usual question is <i>can a student outsource this to AI?</i> — authenticity. But a task can be perfectly authentic and still <b>obsolete</b>: it assesses a pre-AI workflow when the real job is now AI-augmented. An RTO needs both calls. Ruling makes both, on every task, and routes to one decision.</p>
+    <div class="axes">
+      <div class="axis a">
+        <div class="ax">AXIS A · AUTHENTICITY</div>
+        <h4>Is the evidence the student's own?</h4>
+        <p>The outsourcing test. Could a student run this through AI, unsupervised, and have it not show?</p>
+        <div class="scale">NONE · LOW · MEDIUM · HIGH</div>
+      </div>
+      <div class="axis b">
+        <div class="ax">AXIS B · CURRENCY</div>
+        <h4>Does it assess the work as done now?</h4>
+        <p>The modernisation test — acting on Warrant's research. Or is it a pre-AI workflow the industry has left behind?</p>
+        <div class="scale">CURRENT · PARTIAL · OBSOLETE</div>
+      </div>
+    </div>
+    <p class="lead" style="margin-top:18px;font-size:14.5px;color:var(--mute);">Ruling never researches the currency question itself — it <b style="color:var(--soft)">consumes Warrant's Resist/Integrate split</b> and acts on it. No split, no web search. That firewall is what keeps it an operator, not a researcher.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="label">Five decisions · every task gets exactly one</h2>
+    <div class="grid">
+      <div class="card c-green"><div class="name">COMPLIANT</div><p>Authentic and current. → one line naming the resistance mechanism.</p></div>
+      <div class="card c-amber"><div class="name">REVISE</div><p>A named fix preserves coverage — for authenticity, to <b>modernise</b>, or both. → the exact problem + the exact fix.</p></div>
+      <div class="card c-orange"><div class="name">REBUILD</div><p>The method is structurally wrong for the evidence type. → why rebuild beats revise + the replacement.</p></div>
+      <div class="card c-red"><div class="name">FLAG</div><p>A human must decide what the operator structurally cannot. → what + why.</p></div>
+      <div class="card c-violet"><div class="name">ESCALATE</div><p>A critical input is missing. → the assumption, the flip — and it <b>still decides</b>.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="label">End-to-end · it doesn't just advise, it commits</h2>
+    <h3>Task in → decision → committed change across three formats.</h3>
+    <p class="lead">Asked to execute, Ruling applies the fix to the assessment Markdown (the source of truth), regenerates the Word doc, and regenerates the LMS page — leaving a <b>tracked, reversible change pack</b> (before/after + changelog + diffs). No silent overwrite; an RTO can see and undo every edit.</p>
+    <div class="flow">
+      <div class="node"><div class="t">Warrant split</div><div class="d">Resist/Integrate, per element</div></div>
+      <div class="arr">→</div>
+      <div class="node"><div class="t">Ruling decides</div><div class="d">two axes → one decision</div></div>
+      <div class="arr">→</div>
+      <div class="node"><div class="t">Commit</div><div class="d">md → docx → LMS</div></div>
+      <div class="arr">→</div>
+      <div class="node"><div class="t">Change pack</div><div class="d">tracked · reversible</div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="label">A real run · BSBTEC201, Assessment 2, Step 3</h2>
+    <h3>Authentic, but obsolete — so Ruling modernised it.</h3>
+    <p class="lead">The task asked students to produce a memo by hand. Warrant's split marks document production <b>INTEGRATE</b> — the real competency is now directing and quality-checking AI output. v1 Ruling would have passed this (it's authentic). The currency axis caught it and modernised it to the judgment triad (<b>Step 3A</b>) — then, because that triad is still outsourceable as unsupervised take-home, Ruling added a verification anchor of its own (<b>Step 3B</b>): it <b>consumed Warrant's verdict, not its method</b>. Committed across all three formats.</p>
+    <p style="font-size:12px;font-weight:700;letter-spacing:.6px;color:var(--mute);margin:24px 0 8px;">1 · THE ASSESSMENT TASK (md + Word doc)</p>
+    <div class="ba">
+      <div class="col before">
+        <div class="h">BEFORE — v1.0 (manual production)</div>
+<pre>Step 3: Prepare the welcome memo
+
+Open the New Starter Welcome Memo Template
+(RLG-GRP-TMP-002) in your word processor.
+Prepare a short welcome memo for the three
+new starters, following the template and
+Ridgeline's house style. Save the file when
+you are done.</pre>
+      </div>
+      <div class="col after">
+        <div class="h">AFTER — v1.1 (direct → judge → verify)</div>
+<pre>Step 3A — direct the tool, document judgment
+Use an AI tool to draft the memo. Then:
+(a) record your prompt; (b) identify ≥2
+problems in the AI draft; (c) correct each
+and explain why it matters.   [Template T2a]
+
+Step 3B — verify it's yours (unaided)
+Submitting 3A unlocks an unseen change to the
+brief. You record a 2–3 min, one-take,
+unaided response adapting the memo. [Template T2b]
+The anchor compensates 3A's take-home
+outsourcing → authenticity holds at LOW.</pre>
+      </div>
+    </div>
+
+    <p style="font-size:12px;font-weight:700;letter-spacing:.6px;color:var(--mute);margin:26px 0 8px;">2 · THE LEARNER GUIDE, SECTION 2.1 (the taught content) — so what's taught matches what's assessed</p>
+    <div class="ba">
+      <div class="col before">
+        <div class="h">BEFORE — ends at the application list</div>
+<pre>2.1 The common business applications
+
+[word processor, spreadsheet, email,
+ presentation, database, PDF, cloud storage —
+ what each is for]
+
+These are the applications used for organising
+electronic information in most Australian
+workplaces. The types are the same even when
+the brand differs.</pre>
+      </div>
+      <div class="col after">
+        <div class="h">AFTER — adds the AI-augmented competency</div>
+<pre>... (same application list) ...
+
+Working with AI in business software
+
+Most of these applications now include an AI
+assistant — Copilot in Word and Excel, Gemini
+in Google Workspace. Producing a routine
+document now means directing an AI tool to
+draft it, then checking and correcting the
+result. The skill is your judgment over the
+output. This is why Assessment 2 asks you to
+draft the memo with an AI tool and then
+evaluate and correct what it produces.</pre>
+      </div>
+    </div>
+
+    <p style="font-size:12px;font-weight:700;letter-spacing:.6px;color:var(--mute);margin:26px 0 8px;">3 · THE REGENERATED CANVAS PAGE, RENDERED — the green-outlined block is what Ruling added</p>
+    <div style="border:1px solid var(--line2);border-radius:12px;overflow:hidden;background:#fff;padding:20px;">
+      <div style="max-width:860px;margin:0 auto;font-family:Calibri,Arial,sans-serif;">
+        <div style="background:#101F14;padding:20px;border-radius:8px;margin-bottom:18px;"><div style="color:white;margin:0;font-size:21px;font-weight:700;">2.1 – The common business applications and what each is for</div></div>
+        <p style="font-size:14px;color:#000;line-height:1.6;">Most workplaces use a small set of application types. You do not need to master all of them; you need to know which one suits which job:</p>
+        <ul style="font-size:14px;color:#000;line-height:1.75;padding-left:20px;margin-bottom:16px;">
+          <li><strong>Word processor</strong> (Word, Google Docs): letters, reports, memos.</li>
+          <li><strong>Spreadsheet</strong> (Excel, Sheets): lists, numbers, budgets.</li>
+          <li><strong>Email and calendar</strong> (Outlook, Gmail): messages, attachments, scheduling.</li>
+          <li><strong>Presentation</strong> (PowerPoint, Slides): slides for a talk or update.</li>
+          <li><strong>Database / records system</strong>: structured records that can be searched.</li>
+        </ul>
+        <p style="font-size:14px;color:#000;line-height:1.6;">These are the applications used for organising electronic information in most Australian workplaces. Some use Microsoft, some Google, many a mix; the <em>types</em> are the same.</p>
+        <div style="outline:3px solid #00E676;outline-offset:3px;border-radius:8px;padding:12px 15px;margin-top:18px;background:#fbfdfb;">
+          <p style="font-size:14px;color:#000;line-height:1.6;margin:0 0 6px;"><strong>Working with AI in business software</strong></p>
+          <p style="font-size:14px;color:#000;line-height:1.6;margin:0;">Most of these applications now include an AI assistant — for example Microsoft Copilot in Word and Excel, or Gemini in Google Workspace. In current workplaces, producing a routine document increasingly means <em>directing</em> an AI tool to draft it and then <em>checking and correcting</em> the result, rather than typing every word from scratch. The skill that matters is your judgment over the output: does the draft match the brief, the house style and the facts? This is why Assessment 2 asks you to draft the welcome memo with an AI tool and then evaluate and correct what it produces — the competency being assessed is governing the tool, not the AI's ability to write a memo.</p>
+        </div>
+        <div style="background:#000;color:#fff;font-size:12px;padding:9px 16px;display:flex;justify-content:space-between;border-radius:4px;margin-top:20px;"><span>[BUYER_RTO_NAME] | RTO [BUYER_RTO_NUMBER]</span><span>BSBTEC201 – Use business software applications</span></div>
+      </div>
+    </div>
+    <p style="margin:8px 0 0;font-size:13px;color:var(--mute);">Rendered from the regenerated <code style="color:var(--soft)">Page07_Section2-1.html</code> in the change pack. A live Canvas URL drops in here once published.</p>
+
+    <div class="badge3" style="margin-top:20px;">
+      <span>md <b>✓</b></span>
+      <span>docx <b>✓ re-parsed</b></span>
+      <span>LMS <b>✓ regenerated</b></span>
+      <span>learner guide <b>✓ teaching matches</b></span>
+      <span>rollback <b>✓ byte-identical</b></span>
+    </div>
+    <p class="lead" style="margin-top:16px;font-size:14px;color:var(--mute);">The change pack — authorising ruling, changelog, before/after, diff cards — is committed in the repo at <code style="color:var(--soft)">worked-units/BSBTEC201/_ruling-change-packs/</code>.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="label">Restraint · the AI-thin case</h2>
+    <h3>It refuses to manufacture relevance.</h3>
+    <p class="lead">On CHCDIV001 (Work with diverse people) the split marks every element <b>RESIST</b> — culturally responsive practice isn't AI-augmented. Ruling leaves the AI-free tasks <b>COMPLIANT</b> and does <b>not</b> bolt "use an AI tool" onto interpersonal work. An operator that can't leave a current task alone is as broken as one that can't catch an obsolete one.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="label">How it decides · seven named stages</h2>
+    <div class="stages">
+      <div class="stage"><div class="n">STAGE-1</div><div class="b"><h4>Intake &amp; assume</h4><p>Set mode (task/package · advise/execute). Read the Warrant split. Assume what's missing.</p></div></div>
+      <div class="stage"><div class="n">STAGE-2</div><div class="b"><h4>Classify</h4><p>Name the task type (T1–T9).</p></div></div>
+      <div class="stage"><div class="n">STAGE-3</div><div class="b"><h4>Two-axis test</h4><p>Outsourcing (authenticity) <i>and</i> currency (modernisation), scored together.</p></div></div>
+      <div class="stage"><div class="n">STAGE-4</div><div class="b"><h4>Consistency</h4><p>Self-undermining instructions? Does the AI policy match the tasks?</p></div></div>
+      <div class="stage"><div class="n">STAGE-5</div><div class="b"><h4>Verification</h4><p>Anchored? (package: coverage · chain · ≥1 secure task)</p></div></div>
+      <div class="stage"><div class="n">STAGE-6</div><div class="b"><h4>Rule</h4><p>Arbitrate both axes → one decision, one action, every rule ID cited.</p></div></div>
+      <div class="stage commit"><div class="n">STAGE-7</div><div class="b"><h4>Commit ⟨execute⟩</h4><p>Apply md → docx → LMS. Verify each. Write the change pack. Reversible.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="label">Run it yourself</h2>
+    <ol class="how">
+      <li><b>Open the repo in Claude Code</b>, or add the contents of <code>ruling/</code> to a Claude project's knowledge.</li>
+      <li><b>Instruction:</b>
+        <div class="inst mono">Read identity.md and rules.md. You are Ruling. Score authenticity and currency, output one decision with one action, cite the rule IDs. Never ask me what to do — assume and state. Default to ADVISE; only EXECUTE when I ask, and supply the unit's files.</div>
+      </li>
+      <li><b>Paste an assessment task</b> (add a Warrant split to assess currency). Or run the eight copy-paste tests in <code>JUDGE_GUIDE.md</code> — each states the decision it must reach and the rule that forces it.</li>
+    </ol>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><span class="lb">Learn<span class="g">built</span></span> — the course materials Australian RTOs need for ASQA, in days not months. Ruling is the compliance operator in that toolkit.<br>
+    Pair to <a href="https://github.com/hubbardjoshua9-a11y/warrant">Warrant</a>, the researcher. &nbsp;·&nbsp; <a href="https://github.com/hubbardjoshua9-a11y/ruling">Ruling on GitHub</a> &nbsp;·&nbsp; Cliefnotes Weekly Comp #7 — The Operator</p>
+  </div>
+</footer>
+
+</body>
+</html>

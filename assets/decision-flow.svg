@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 742" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <path d="M0,0 L9,4.5 L0,9 z" fill="#475569"/>
+    </marker>
+    <style>
+      .box { fill:#f8fafc; stroke:#cbd5e1; stroke-width:1.5; }
+      .num { fill:#0a8f4f; font-weight:700; font-size:12px; letter-spacing:.5px; }
+      .title { fill:#0f172a; font-weight:700; font-size:15px; }
+      .desc { fill:#475569; font-size:11px; }
+      .axhead { font-weight:700; font-size:11.5px; }
+      .axval { fill:#64748b; font-size:11px; font-family:ui-monospace,Menlo,Consolas,monospace; }
+      .edge { stroke:#475569; stroke-width:1.6; fill:none; }
+      .tlabel { fill:#94a3b8; font-size:9.5px; font-style:italic; }
+      .outcap { font-weight:700; font-size:13px; }
+      .outdesc { fill:#475569; font-size:10.5px; }
+      .hdr { fill:#0f172a; font-weight:800; font-size:20px; }
+      .sub { fill:#64748b; font-size:12px; }
+    </style>
+  </defs>
+
+  <text x="40" y="42" class="hdr">Ruling — the two-axis compliance triage</text>
+  <text x="40" y="63" class="sub">One task in. One decision out. Seven stages, two axes, five outputs — and it commits the change.</text>
+
+  <!-- ============ LEFT: STAGES ============ -->
+  <!-- S1 -->
+  <rect class="box" x="40" y="90" width="380" height="56" rx="10"/>
+  <text x="56" y="112" class="num">STAGE-1</text>
+  <text x="130" y="112" class="title">INTAKE &amp; ASSUME</text>
+  <text x="56" y="133" class="desc">Set mode (task/package · ADVISE/EXECUTE). Read the Warrant split. Assume gaps.</text>
+
+  <!-- S2 -->
+  <rect class="box" x="40" y="158" width="380" height="56" rx="10"/>
+  <text x="56" y="180" class="num">STAGE-2</text>
+  <text x="130" y="180" class="title">CLASSIFY</text>
+  <text x="56" y="201" class="desc">Name the task type (T1–T9). The type sets the bar to clear.</text>
+
+  <!-- S3 (two axes, taller) -->
+  <rect class="box" x="40" y="226" width="380" height="94" rx="10" fill="#f1f6ff" stroke="#bcd2f0"/>
+  <text x="56" y="248" class="num">STAGE-3</text>
+  <text x="130" y="248" class="title">TWO-AXIS TEST</text>
+  <text x="56" y="270"><tspan class="axhead" fill="#1d4ed8">Axis A · OUTSOURCING</tspan><tspan class="desc"> — is the evidence the student's own?</tspan></text>
+  <text x="56" y="286" class="axval">NONE / LOW / MEDIUM / HIGH</text>
+  <text x="56" y="304"><tspan class="axhead" fill="#0a8f4f">Axis B · CURRENCY</tspan><tspan class="desc"> — does it assess the work as it's done now?</tspan></text>
+  <text x="56" y="320" class="axval">CURRENT / PARTIAL / OBSOLETE</text>
+
+  <!-- S4 -->
+  <rect class="box" x="40" y="332" width="380" height="56" rx="10"/>
+  <text x="56" y="354" class="num">STAGE-4</text>
+  <text x="130" y="354" class="title">CONSISTENCY</text>
+  <text x="56" y="375" class="desc">Self-undermining instructions? Does the AI policy match the tasks?</text>
+
+  <!-- S5 -->
+  <rect class="box" x="40" y="400" width="380" height="56" rx="10"/>
+  <text x="56" y="422" class="num">STAGE-5</text>
+  <text x="130" y="422" class="title">VERIFICATION</text>
+  <text x="56" y="443" class="desc">Anchor exists? (package: coverage · chain · ≥1 secure task)</text>
+
+  <!-- S6 -->
+  <rect class="box" x="40" y="468" width="380" height="56" rx="10" fill="#eef7f1" stroke="#9fcfb4"/>
+  <text x="56" y="490" class="num">STAGE-6</text>
+  <text x="130" y="490" class="title">RULE</text>
+  <text x="56" y="511" class="desc">Arbitrate both axes by precedence → one decision + one action + rule IDs.</text>
+
+  <!-- S7 EXECUTE -->
+  <rect class="box" x="40" y="536" width="380" height="70" rx="10" fill="#e7f9f1" stroke="#3fb98a"/>
+  <text x="56" y="558" class="num" fill="#0a8f4f">STAGE-7</text>
+  <text x="130" y="558" class="title">COMMIT  ⟨EXECUTE mode⟩</text>
+  <text x="56" y="579" class="desc">Apply the fix md → docx → LMS. Verify each. Reversible change pack</text>
+  <text x="56" y="595" class="desc">(before/after + changelog + diffs). Runs only on REVISE / REBUILD.</text>
+
+  <!-- vertical edges between stages -->
+  <path class="edge" d="M230,146 L230,158" marker-end="url(#arrow)"/><text x="238" y="155" class="tlabel">T-12</text>
+  <path class="edge" d="M230,214 L230,226" marker-end="url(#arrow)"/><text x="238" y="223" class="tlabel">T-23</text>
+  <path class="edge" d="M230,320 L230,332" marker-end="url(#arrow)"/><text x="238" y="329" class="tlabel">T-34</text>
+  <path class="edge" d="M230,388 L230,400" marker-end="url(#arrow)"/><text x="238" y="397" class="tlabel">T-45</text>
+  <path class="edge" d="M230,456 L230,468" marker-end="url(#arrow)"/><text x="238" y="465" class="tlabel">T-56</text>
+  <path class="edge" d="M230,524 L230,536" marker-end="url(#arrow)"/><text x="238" y="533" class="tlabel">T-67</text>
+
+  <!-- connector S6 -> outputs -->
+  <path class="edge" d="M420,496 L450,496 L450,270 L466,270" marker-end="url(#arrow)"/>
+  <text x="437" y="430" class="tlabel" text-anchor="middle" transform="rotate(-90 437 430)">one decision</text>
+
+  <!-- ============ RIGHT: OUTPUTS ============ -->
+  <g>
+    <rect x="470" y="92" width="412" height="80" rx="10" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.5"/>
+    <text x="488" y="119" class="outcap" fill="#047857">COMPLIANT</text>
+    <text x="488" y="140" class="outdesc">Authentic and current — passes both axes, verification exists.</text>
+    <text x="488" y="157" class="outdesc">→ one line naming the resistance mechanism.</text>
+  </g>
+  <g>
+    <rect x="470" y="184" width="412" height="80" rx="10" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
+    <text x="488" y="211" class="outcap" fill="#b45309">REVISE</text>
+    <text x="488" y="232" class="outdesc">A named fix preserves coverage — for authenticity, to modernise,</text>
+    <text x="488" y="249" class="outdesc">or both. → the exact problem + the exact fix.</text>
+  </g>
+  <g>
+    <rect x="470" y="276" width="412" height="80" rx="10" fill="#fff7ed" stroke="#fdba74" stroke-width="1.5"/>
+    <text x="488" y="303" class="outcap" fill="#c2410c">REBUILD</text>
+    <text x="488" y="324" class="outdesc">The method is structurally wrong for the evidence type.</text>
+    <text x="488" y="341" class="outdesc">→ why rebuild &gt; revise + the replacement method.</text>
+  </g>
+  <g>
+    <rect x="470" y="368" width="412" height="80" rx="10" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.5"/>
+    <text x="488" y="395" class="outcap" fill="#b91c1c">FLAG</text>
+    <text x="488" y="416" class="outdesc">A human must decide what the operator structurally cannot.</text>
+    <text x="488" y="433" class="outdesc">→ what the human decides + why Ruling can't.</text>
+  </g>
+  <g>
+    <rect x="470" y="460" width="412" height="80" rx="10" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.5"/>
+    <text x="488" y="487" class="outcap" fill="#6d28d9">ESCALATE</text>
+    <text x="488" y="508" class="outdesc">A critical input is missing — decorates one of the above.</text>
+    <text x="488" y="525" class="outdesc">→ assumption + flip condition, and it STILL decides.</text>
+  </g>
+
+  <text x="470" y="576" class="sub">It never kicks back undecided. Missing input → assume the harder case, state it, rule.</text>
+  <text x="40" y="632" class="sub">Warrant researches the unit.  Ruling rules on the task — and commits the change.</text>
+</svg>
